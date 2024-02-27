@@ -18,10 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     join_all(tasks).await;
 
     servers.sort_unstable_by(|lhs, rhs| lhs.latency.partial_cmp(&rhs.latency).unwrap());
-    servers = servers
-        .into_iter()
-        .filter(|x| x.latency != f64::MAX) // Don't display the Server which failed to send a resp back
-        .collect();
+    servers.retain(|x| x.latency != f64::MAX); // Don't display the Server which failed to send a resp back
 
     println!(
         "{}",

@@ -5,13 +5,13 @@ use std::fs::read_to_string;
 use std::path::PathBuf;
 
 #[cfg(target_os = "macos")]
-pub const RELAY_FILE_PATH: &'static str = "/Library/Caches/mullvad-vpn/relays.json";
+pub const RELAY_FILE_PATH: &str = "/Library/Caches/mullvad-vpn/relays.json";
 
 #[cfg(target_os = "windows")]
-pub const RELAY_FILE_PATH: &'static str = "C:/ProgramData/Mullvad VPN/cache/relays.json";
+pub const RELAY_FILE_PATH: &str = "C:/ProgramData/Mullvad VPN/cache/relays.json";
 
 #[cfg(target_os = "linux")]
-pub const RELAY_FILE_PATH: &'static str = "/var/cache/mullvad-vpn/relays.json";
+pub const RELAY_FILE_PATH: &str = "/var/cache/mullvad-vpn/relays.json";
 
 pub fn check_path_exists(path: &str) -> Result<PathBuf, String> {
     let parsed_path = PathBuf::from(path);
@@ -21,20 +21,20 @@ pub fn check_path_exists(path: &str) -> Result<PathBuf, String> {
     Err(format!("Provided path {} does not exist", path))
 }
 
-pub fn parse_relays_file<'a>(file_path: PathBuf) -> Vec<Server> {
+pub fn parse_relays_file(file_path: PathBuf) -> Vec<Server> {
     let content = read_to_string(file_path).unwrap();
     let v: Value = serde_json::from_str(&content).unwrap();
     v["countries"]
         .as_array()
         .unwrap()
-        .into_iter()
+        .iter()
         .flat_map(|country| {
             country["cities"]
                 .as_array()
                 .unwrap()
-                .into_iter()
+                .iter()
                 .flat_map(|city| {
-                    city["relays"].as_array().unwrap().into_iter().map(|relay| {
+                    city["relays"].as_array().unwrap().iter().map(|relay| {
                         Server {
                             country: country["name"].as_str().unwrap().to_string(), // Directly converting to string was giving a weird result, need to investigate
                             city: city["name"].as_str().unwrap().to_string(),

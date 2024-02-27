@@ -91,10 +91,10 @@ impl Server {
             .find(|line| line.contains("avg"))
             .unwrap_or("");
         let average_time: String = rtt_line
-            .split_once("=")
+            .split_once('=')
             .unwrap_or(("", ""))
             .1
-            .split("/")
+            .split('/')
             .nth(1)
             .unwrap_or("")
             .to_string();
